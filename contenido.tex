@@ -1,0 +1,984 @@
+% Template:     Informe/Reporte LaTeX
+% Documento:    Archivo de ejemplo
+% Versión:      6.2.2 (30/01/2019)
+% Codificación: UTF-8
+%
+% Autor: Pablo Pizarro R. @ppizarror
+%        Facultad de Ciencias Físicas y Matemáticas
+%        Universidad de Chile
+%        pablo.pizarro@ing.uchile.cl, ppizarror.com
+%
+% Manual template: [https://latex.ppizarror.com/Template-Informe/]
+% Licencia MIT:    [https://opensource.org/licenses/MIT/]
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+% Las secciones se inician con \section, si se quiere una sección sin número se
+% pueden usar las funciones \sectionanum (sección sin número) o la función
+% \sectionanumnoi para crear el mismo título sin numerar y sin aparecer en el índice.
+\section{Descripción de la planta}
+	
+	La planta que se considera para el diseño de los controles está formada por cuatro tanques idénticos, teniendo dos de ellos colocados encima de los otros dos, de tal forma que los depósitos superiores desaguan sobre los inferiores. A su vez, los dos inferiores descargan agua a un depósito inferior del cual se coge el agua que alimenta a los cuatro tanques mediante dos bombas: A y B. La bomba se encarga de bombear agua a los depósitos 1 y 4, mientras que la bomba B bombea a los tanques 2 y 3. La disposición de la estructura de la planta se muestra en la Figura \ref{img:imagenplanta}\\
+	
+	\insertimage[\label{img:imagenplanta}]{imagenes/dibujo_planta.png}{scale=0.7}{Disposición de tanques.}
+	
+	Las variables a controlar son los niveles de agua en los tanques 1 y 3. Para ello, se tiene dos válvulas de tres vías fijadas (es decir, no controlables) y los tanques A y B, sobre los que se actúa para controlar dichas variables. Hay que tener en cuenta que las bombas también afectarán a los niveles 3 y 4, que a su vez influyen en los niveles que queremos controlar. 
+	
+	
+	% SUB-SECCIÓN
+	% Las sub-secciones se inician con \subsection, si se quiere una sub-sección sin
+	% número se pueden usar las funciones \subsectionanum (nuevo subtítulo sin numeración)
+	% o la función \subsectionanumnoi para crear el mismo subtítulo sin numerar y sin
+	% aparecer en el índice
+	
+	\subsection{Especificaciones}
+		
+		Para elaborar el modelo de la planta, se necesitan los parámetros que la definen. Los depósitos tienen una sección de  0.03 $m^2$. La sección de descarga de los tanques es de 1.3104$\times 10^{-5}$$m^2$ , 1.5074 $\times 10^{-5}$$m^2$ , 9.2673$\times 10^{-5}$$m^2$ y 8.8164$\times 10^{-5}$$m^2$  para los depósitos 1,2,3 y 4 respectivamente. La apertura de las válvulas de tres vías está fijada a 0.2 para la salida de la bomba A y a 0.3 para la bomba B. Esto quiere decir que únicamente el 20\% de lo bombeado por A irá a para al nivel 1 y sólo el 30\% irá al nivel 2. Esto supone un gran problema ya que las variables que queremos controlar son concretamente los niveles 1 y 2, y según la configuración de las válvulas, el resto de caudal bombeado (80\% y 70\%) se va a los depósitos 3 y 4 respectivamente.\\
+		En cuanto a restricciones, se tienen unos márgenes de operación tanto para las salidas como para los mandos. En el caso de las salidas, la altura máxima que se puede alcanzar es de 1,3 m en los tanques 1 y 2, y 1,15 y 1,25 m para los tanques 3 y 4. Los niveles mínimos se establecen a 0,2 metros en los cuatro tanques. El caudal máximo que pueden dar las bombas es de 2,5 $m^3$ por hora. El tiempo mínimo de muestreo será de 5 segundos en todo control.
+		
+	% SUB-SECCIÓN
+	\subsection{Modelo no-lineal y puntos de operación}
+		Las ecuaciones del sistema que gobiernan la dinámica de los niveles de los tanques se muestra en la Figura \ref{img:imagenecuacionesplanta}\\
+		
+		\insertimage[\label{img:imagenecuacionesplanta}]{imagenes/ecuaciones_planta.png}{scale=0.45}{Dinámica del sistema: ecuaciones de estado. }
+		
+		Como se puede observar, se trata de un sistema no-lineal al incorporar raíces cuadras de las variables de estado. Para todos los controles que se van a desarrollar, se necesita un modelo linealizado en algún punto de operación. Estos puntos de operación se caracterizando por tener derivadas nulas de las variables de estado. En la Tabla \ref{tab:tabla_hs_ptoop} se presentan los puntos de operación tomados para realizar los controles, tanto PID como predictivos. 
+		
+		% Tabla generada con el plugin Excel2Latex
+		\begin{table}[htbp]
+			\centering
+			\caption{Puntos de operación.}
+			
+			\begin{tabular}{cccccccc}
+				\hline
+				\textbf{Punto} & \textbf{Precio} & \textbf{h1} & \textbf{h2} & \textbf{h3} & \textbf{h4}& \textbf{Caudal A} & \textbf{Caudal B}\bigstrut\\
+				\hline
+				$1$ & $c=1.5, p=25$ &$0.7$ & $0.35$ & $1.1142$ & $0.2873$  & $0.9419$ & $2.2284$ \bigstrut[t]\\
+				$2$ & $c=1, p=10$ & $0.7$ & $0.65$ & $0.9174$ & $0.8968$ & $1.6641$ & $2.022$\bigstrut[b]\\
+				$3$ & $c=0.5, p=20$ & $0.7$ & $0.65$ & $0.4025$ & $1.1939$ & $1.9202$ & $1.3393$\bigstrut[b]\\
+				$4$ & $c=1, p=50$ & $0.4$ & $0.35$ & $0.5361$ & $0.4647$ & $1.1979$ & $1.5457$\bigstrut[b]\\
+				$PID$ & $$ & $0.4$ & $0.35$ & $0.5361$ & $0.4647$ & $1.1979$ & $1.5457$\bigstrut[b]\\
+				\hline
+			\end{tabular}
+			\label{tab:tabla_hs_ptoop}
+			%\label{tab:tabla-1}
+		\end{table}
+		
+En cada punto de operación se obtiene una planta linealizada distinta que es la que usa para obtener el control, ya sea PID o predictivo. En el caso del predictivo, también se han añadido los pesos establecidos para los puntos de operación. Cuanto mayor sean, el error de seguimiento disminuye provocando un sistema más lento, mientras que con la disminución de pesos se obtiene una respuesta mucho más agresiva y un sistema más rápido.
+
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+\newpage
+\section{Objetivos del control}
+
+	% SUB-SECCIÓN
+	\subsection{Calidad de respuesta}
+
+		% Se inserta una imagen flotante en la izquierda del documento con
+		% \insertimageleft, al igual que las demás funciones, el primer parámetro
+		% es opcional, luego viene la ubicación de la imagen, seguido de la escala
+		% (un 30% del ancho de página) y por último su leyenda. Para insertar una
+		% imagen flotante en la derecha se utiliza \insertimageright usando los
+		% mismos parámetros.
+		\insertimageleft[\label{img:imagen-izquierda}]{ejemplos/test-image-wrap}{0.3}{Apolo flotando a la izquierda.}
+
+		\lipsum[1]
+
+		% Párrafos de ejemplo
+		\newp \lipsum[115]
+		\newp \lipsum[2]
+
+		% Agrega una ecuación con leyenda
+		\insertequationcaptioned[\label{eqn:formulasinsentido}]{\int_{a}^{b} f(x) \dd{x} = \fracnpartial{f(x)}{x}{\eta} \cdotp \textstyle \sum_{x=a}^{b} f(x)\cancelto{1+\frac{\epsilon}{k}}{(1+\Delta x)}}{Ecuación sin sentido.}
+
+		% Aquí no es necesario usar \newp dado que todas las funciones \insert... añaden un párrafo nuevo por defecto
+		\lipsum[115]
+
+		\newp \lipsum[4]
+
+	% Inserta un subtítulo sin número
+	\subsection{Minimizar función de coste}
+
+		% Párrafos
+		\lipsum[7]
+		\newp \lipsum[2]
+
+		% Se inserta una ecuación larga con el entorno gathered (1 solo número de ecuación)
+		\insertgathered[\label{eqn:eqn-larga}]{
+			\lpow{\Lambda}{f} = \frac{L\cdot f}{W} \cdot \frac{\pow{\lpow{Q}{e}}{2}}{8 \pow{\pi}{2} \pow{W}{4} g} + \sum_{i=1}^{l} \frac{f \cdot \big( M - d\big)}{l \cdot W} \cdot \frac{\pow{\big(\lpow{Q}{e}- i\cdot Q\big)}{2}}{8 \pow{\pi}{2} \pow{W}{4} g}\\
+			Q_e = 2.5Q \cdot \int_{0}^{e} V(x) \dd{x} + \aasin{ \bigg(1+\frac{1}{1-e}\bigg) }
+		}
+
+		% Nuevo párrafo
+		\lipsum[4]
+
+		% Se inserta un multicols, con esto se pueden escribir párrafos en varias columnas
+		\begin{multicols}{2}
+
+			% Párrafo 1
+			\lipsum[4]
+
+			% Ecuación encerrada en una caja
+			\insertequation[]{ \boxed{f(x) = \fracdpartial{u}{t}} }
+
+			% Párrafo 2 del multicols
+			\lipsum[1]
+
+		\end{multicols}
+
+	% SUB-SECCIÓN
+	\subsection{Robustez}
+
+		% A continuación se crea una función auxiliar, esta es una herramienta
+		% extremadamente importante y muy útil. Esta función de ejemplo toma dos
+		% parámetros, uno es el lenguaje del código fuente, el segundo el
+		% identificador en el manual.
+		\newcommand{\insertsrcmanual}[2]{\href{https://latex.ppizarror.com/informe.html\#hlp-srccode\&srctype=#1}{#2}}
+
+		El template permite la inserción de los siguientes lenguajes de programación de forma nativa: \insertsrcmanual{bash}{bash}, \insertsrcmanual{c}{C}, \insertsrcmanual{csharp}{C\#}, \insertsrcmanual{cpp}{C++}, \insertsrcmanual{cuda}{cuda}, \insertsrcmanual{docker}{DOCKER}, \insertsrcmanual{html5}{HTML5}, \insertsrcmanual{java}{Java}, \insertsrcmanual{js}{Javascript}, \insertsrcmanual{json}{JSON}, \insertsrcmanual{kotlin}{Kotlin}, \insertsrcmanual{latex}{LaTeX}, \insertsrcmanual{matlab}{Matlab}, \insertsrcmanual{opencl}{OpenCL}, \insertsrcmanual{opensees}{OpenSees}, \insertsrcmanual{perl}{Perl}, \insertsrcmanual{php}{PHP}, \insertsrcmanual{plaintext}{Texto plano}, \insertsrcmanual{pseudocode}{Pseudocódigo}, \insertsrcmanual{python}{Python}, \insertsrcmanual{ruby}{Ruby}, \insertsrcmanual{scala}{Scala}, \insertsrcmanual{sql}{SQL}, \insertsrcmanual{tcl}{TCL} y \insertsrcmanual{xml}{XML}. Para insertar un código fuente se debe usar el entorno \texttt{sourcecode}, o el entorno \texttt{sourcecodep} si es que se quiere utilizar parámetros adicionales. \newp
+
+		A continuación se presenta un ejemplo de inserción de código fuente en Python (Código \ref{codigo-python}), Java (Código \ref{codigo-java}) y Matlab (Código \ref{codigo-matlab}):
+
+% Se define el lenguaje del código. Cuidado: Los códigos en LaTeX son sensibles a las tabulaciones y espacios en blanco
+\begin{sourcecode}[\label{codigo-python}]{python}{Ejemplo en Python.}
+import numpy as np
+
+def incmatrix(genl1, genl2):
+	m = len(genl1)
+	n = len(genl2)
+	M = None # Comentario 1
+	VT = np.zeros((n*m, 1), int) # Comentario 2
+\end{sourcecode}
+
+\begin{sourcecode}[\label{codigo-java}]{java}{Ejemplo en Java.}
+import java.io.IOException;
+import javax.servlet.*;
+
+// Hola mundo
+public class Hola extends GenericServlet {
+	public void service(ServletRequest request, ServletResponse response)
+	throws ServletException, IOException{
+		response.setContentType("text/html");
+		PrintWriter pw = response.getWriter();
+		pw.println("Hola, mundo!");
+		pw.close();
+	}
+}
+\end{sourcecode}
+
+\begin{sourcecode}[\label{codigo-matlab}]{matlab}{Ejemplo en Matlab.}
+% Se crea gráfico
+f = figure(1); hold on;
+movegui(f, 'center');
+xlabel('td/Tn'); ylabel('FAD=Umax/Uf0');
+title('Espectro de pulso de desplazamiento');
+
+for j = 1:length(BETA)
+	fad = ones(1, NDATOS); % Arreglo para el FAD
+	for i = 1:NDATOS
+		[t, u_t, ~, ~] = main(BETA(j), r(i), M, K, F0, 0);
+		fad(i) = max(abs(u_t)) / uf0;
+	end
+end
+\end{sourcecode}
+
+	% SUB-SECCIÓN
+	\subsection{---- NO PARA EL INFORME -- Como meter imágenes}
+
+	El template ofrece el entorno \href{https://latex.ppizarror.com/informe.html#hlp-images}{\texttt{images}} que permite insertar múltiples imágenes de una manera muy sencilla\footnote{Desde la versión \texttt{6.0.0} no se da soporte a las funciones de inserción de imágenes múltiples \texttt{\textbackslash insertdoubleimage}, \texttt{\textbackslash insertdoubleeqimage}, \texttt{\textbackslash inserttripleimage}, \texttt{\textbackslash inserttripleeqimage}, \texttt{\textbackslash insertquadimage}, \texttt{\textbackslash insertpentaimage} y \texttt{\textbackslash inserthexaimage}.}. Para crear imágenes múltiples se deben usar las siguientes instrucciones:
+
+\begin{sourcecode}{latex}{}
+\begin{images}[\label{imagenmultiple}]{Ejemplo de imagen múltiple.}
+	\addimage{ejemplos/test-image}{width=6.5cm}{Ciudad.}
+	\addimage{ejemplos/test-image-wrap}{width=5cm}{Apolo.}
+	\imagesnewline
+	\addimage{ejemplos/test-image}{width=12cm}{Ciudad más grande.}
+\end{images}
+\end{sourcecode}
+
+	Obteniendo así:
+
+	\begin{images}{Ejemplo de imagen múltiple.}
+		\addimage{ejemplos/test-image}{width=6.5cm}{Ciudad.}
+		\addimage{ejemplos/test-image-wrap}{width=5cm}{Apolo.}
+		\imagesnewline
+		\addimage{ejemplos/test-image}{width=12cm}{Ciudad más grande.}
+	\end{images}
+
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+% Inserta una sección sin número
+\newpage
+\section{Control PID Clásico}
+
+	% Inserta un subtítulo sin número
+	\subsectionanum{Listas y Enumeraciones}
+
+		Hacer listas enumeradas con \LaTeX\ es muy fácil con el template\footnote{También puedes revisar el manual de las enumeraciones en \url{http://www.texnia.com/archive/enumitem.pdf}.}, para ello debes usar el comando \texttt{\textbackslash begin\{enumerate\}}, cada elemento comienza por \texttt{\textbackslash item}, resultando así:
+
+		\begin{enumerate}
+			\item Grecia
+			\item Abracadabra
+			\item Manzanas
+		\end{enumerate}
+
+		También se puede cambiar el tipo de enumeración, se pueden usar letras, números romanos, entre otros. Esto se logra cambiando el \textbf{label} del objeto \texttt{enumerate}. A continuación se muestra un ejemplo usando letras con el estilo \texttt{\textbackslash alph} \footnote{Con \texttt{\textbackslash Alph} las letras aparecen en mayúscula.}, números romanos con \texttt{\textbackslash roman} \footnote{Con \texttt{\textbackslash Roman} los números romanos salen en mayúscula.} o números griegos con \texttt{\textbackslash greek}\footnote{Una característica propia del template, con \texttt{\textbackslash Greek} las letras griegas están escritas en mayúscula.}:
+
+		\begin{multicols}{3}
+			\begin{enumeratebf}[label=\alph*) ] % Fuente en negrita
+				\item Peras
+				\item Manzanas
+				\item Naranjas
+			\end{enumeratebf}
+
+			\begin{enumerate}[label=\greek*) ]
+				\item Matemáticas
+				\item Lenguaje
+				\item Filosofía
+			\end{enumerate}
+
+			\begin{enumerate}[label=\roman*) ]
+				\item Rojo
+				\item Café
+				\item Morado
+			\end{enumerate}
+		\end{multicols}
+
+		Para hacer listas sin numerar con \LaTeX\ hay que usar el comando \texttt{\textbackslash begin\{itemize\}}, cada elemento empieza por \texttt{\textbackslash item}, resultando:
+
+		\begin{multicols}{3}
+			\begin{itemize}[label={--}]
+				\item Peras
+				\item Manzanas
+				\item Naranjas
+			\end{itemize}
+
+			\begin{enumerate}[label={*}]
+				\item Rojo
+				\item Café
+				\item Morado
+			\end{enumerate}
+
+			\begin{itemize}
+				\item Árboles
+				\item Pasto
+				\item Flores
+			\end{itemize}
+		\end{multicols}
+
+	% Inserta un subtítulo sin número
+	\subsection{Otros}
+
+		Recuerda revisar el manual de todas las funciones y configuraciones de este template visitando el siguiente link: \url{https://latex.ppizarror.com/Template-Informe/}. Si necesitas una ayuda muy específica sobre el template, o si tienes alguna sugerencia, me puedes enviar un correo a \insertemail{pablo.pizarro@ing.uchile.cl}.
+
+
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+\newpage
+\section{Control PID desacoplado}
+
+
+
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+\newpage
+\section{Control predictivo}
+
+
+% ------------------------------------------------------------------------------
+% NUEVA SECCIÓN
+% ------------------------------------------------------------------------------
+\newpage
+\section{Control predictivo adaptativo (gain scheduling)}
+
+
+% ------------------------------------------------------------------------------
+% REFERENCIAS (ESTILO BIBTEX), revisar configuración \stylecitereferences
+% ------------------------------------------------------------------------------
+\newpage % Salto de página
+\begin{references}
+	\bibitem{ref1}
+	Motivación del Control Avanzado.
+	\textit{Ramón Rodríguez Pecharromán, Juan L. Zamora Macho y Aurelio García Cerrada. Enero 2017. Universidad Pontificia Comillas} \\
+	\url{https://sifo.comillas.edu/pluginfile.php/2234565/mod_resource/content/7/1.\%20Motivaci\%C3\%B3n\%20del\%20Control\%20Avanzado.pdf}
+
+	\bibitem{ref2}
+	Control PID Avanzado.
+	\textit{Ramón Rodríguez Pecharromán, Juan L. Zamora Macho y Aurelio García Cerrada. Enero 2017. Universidad Pontificia Comillas} \\
+	\url{https://sifo.comillas.edu/pluginfile.php/2234566/mod_resource/content/8/2.\%20Control\%20PID\%20avanzado.pdf}
+
+	\bibitem{ref3}
+	Control Sistemas MIMO.
+	\textit{Ramón Rodríguez Pecharromán, Juan L. Zamora Macho y Aurelio García Cerrada. Enero 2018. Universidad Pontificia Comillas} \\
+	\url{https://sifo.comillas.edu/pluginfile.php/2234567/mod_resource/content/1/3_Control_Sistemas_MIMO.pdf}
+	
+	\bibitem{ref4}
+	Control predictivo basado en modelo.
+	\textit{Ramón Rodríguez Pecharromán, Juan L. Zamora Macho y Aurelio García Cerrada. Enero 2017. Universidad Pontificia Comillas} \\
+	\url{https://sifo.comillas.edu/pluginfile.php/2234568/mod_resource/content/5/4.\%20Control\%20predictivo.pdf}
+	
+	\bibitem{ref5}
+	Control Adaptativo.
+	\textit{Ramón Rodríguez Pecharromán, Juan L. Zamora Macho y Aurelio García Cerrada. Enero 2017. Universidad Pontificia Comillas} \\
+	\url{https://sifo.comillas.edu/pluginfile.php/2234569/mod_resource/content/2/5.\%20Control\%20Adaptativo.pdf}
+	
+
+	
+\end{references}
+
+
+% ------------------------------------------------------------------------------
+% ANEXO
+% ------------------------------------------------------------------------------
+\newpage
+\begin{anexo}
+	\section{Código fuente}
+	
+\begin{sourcecode}{matlab}{Código fuente de Matlab utilizado para los cuatro controles}
+
+
+if exist('MPC_4TANQUES_CONTROL','var')>0
+    save MPC_4TANQUES_CONTROL MPC_4TANQUES_CONTROL
+end
+if exist('MPC_4TANQUES_CONTROL_1_1','var')>0
+    save MPC_4TANQUES_CONTROL_1_1 MPC_4TANQUES_CONTROL_1_1
+    save MPC_4TANQUES_CONTROL_1_2 MPC_4TANQUES_CONTROL_1_2
+    save MPC_4TANQUES_CONTROL_1_3 MPC_4TANQUES_CONTROL_1_3
+    save MPC_4TANQUES_CONTROL_1_4 MPC_4TANQUES_CONTROL_1_4
+end
+clc
+clear
+close all
+%%%%%%%%%%%%%%%%%%%%%
+%%% MODELO 4 TANQUES %%%
+%%%%%%%%%%%%%%%%%%%%%
+s=tf('s');
+ts=5;
+z=tf('z',ts);
+
+%___________________________________________
+%% OPCIONES DE SIMULACION Y VISUALIZACION
+%___________________________________________
+% Tipo de ensayo
+% 0. Ensayo con amplitudes pequeñas en los escalones en referencias
+% 1. Ensayo con amplitudes grandes en los escalones en referencias
+tipo_ensayo=1;
+
+% Cantidad de controles que se quieren visualizar:
+% 1.- PID descentralizado
+% 2.- PID con desacoplo
+% 3.- MPC
+% 4.- MPC adaptativo
+visualizar = 1;
+
+% Lista de leyendas en las graficas
+listaLeyendas = {'Control PID sin desacoplo','PID con desacoplo','MPC','MPC adaptativo','Referencia'};
+
+%Ajustes. NO MODIFICAR
+if tipo_ensayo == 0%¡¡NO TOCAR ESTO!!!
+    ampliEsc = [1 1]*0.05;
+else
+    ampliEsc = [1 1]*0.3;
+end
+%tiempo de duración de los pulsos
+tEsc = 1500;
+
+%pesos costes ensayo
+pondQ = [1.5 1 0.5 1];
+pondS = [25 10 20 50];
+pondR = [100 100 100 100];
+
+%_____________________________
+%% PARAMETROS DEL SISTEMA. 
+%_____________________________
+% Parametros (inspirado en Luyben_1996)
+% Seccion de los depositos (m^2)
+A=0.03;
+% Seccion equivalente de los orificios de descarga (m^2)
+a1=1.3104e-4;
+a2=1.5074e-4;
+a3=9.2673e-5;
+a4=8.8164e-5;
+% Apertura de las válvulas de 3 vias (m^3)
+ga=0.2;
+gb=0.3;
+% Vector de parametros
+param=[A a1 a2 a3 a4 ga gb];
+% Limitacion de los mandos (caudales)
+mando_max=2.5;
+mando_min=0;
+% Limitacion de los niveles
+Hmax=[1.3 1.3 1.15 1.25];
+Hmin=[0.2 0.2 0.2 0.2];
+
+%_________________________
+%% PUNTOS DE OPERACIÓN
+%_________________________
+% Se definen en base a un ensayo con dos pulsos decalados en el tiempo en
+% las referencias de h1 y h2. La amplitud del escalón dependerá del tipo de
+% ensayo.
+ptoBase = [0.4 0.35];
+% Se definen h1 y h2 de los cuatro puntos de operación del ensayo
+Xini_1=[ptoBase(1)+ampliEsc(1) ptoBase(2) 1 1]; %Pto 1: h1 alta, h2 baja
+Xini_2=[ptoBase(1)+ampliEsc(1) ptoBase(2)+ampliEsc(2) 1 1]; %Pto 2: h1 alta, h2 alta
+Xini_3=[ptoBase(1) ptoBase(2)+ampliEsc(2) 1 1];%Pto 3: h1 baja, h2 alta
+Xini_4=[ptoBase(1) ptoBase(2) 1 1];%Pto 4: h1 baja, h2 baja
+%Se elige el punto de operación para el modelo de los controles PID
+%(por defecto, el punto de comienzo y final del ensayo)
+selecPtoOp = 4;
+switch selecPtoOp
+    case 1
+        Xini=Xini_1;
+    case 2
+        Xini=Xini_2;
+    case 3
+        Xini=Xini_3;
+    case 4
+        Xini=Xini_4;
+    otherwise
+        Xini=Xini_4;
+        disp('Selección de punto de operación no válida. Se ha asignado el punto de operación por defecto')
+end
+%Para modelo de Simulink
+matRefs = [Xini_1;Xini_2;Xini_3;Xini_4];
+matRefs = matRefs(:,1:2);
+
+% Obtención de los modelos linealizados del sistema. Primero el punto
+% seleccionado para el modelo de los controles PID descentralizados y PID
+% desacoplados.
+
+% Comando 'trim': Se obtienen el resto de estados y las entradas
+% relacionados con el punto de operación expresado en h1, h2.
+Uini=[1 1]';
+Yini = ones(4,1);
+% Valores fijados
+IUini=[];
+IXini=[1 2];
+IYini=[];
+[Xpo,Upo,Ypo,DXpo]=trim('Modelo_4tanques',Xini(:),Uini(:),Yini(:),IXini(:),IUini(:),IYini(:));
+disp('Punto de operación:')
+disp('[qao qbo] =')
+disp(Upo')
+disp('[h1o h2o h3o h4o] =')
+disp(Xpo')
+
+%Ahora se hace lo mismo para el resto de puntos de operación, lo cual será
+%útil para los controles predictivo y predictivo adaptativo
+[Xpo_1,Upo_1]=trim('Modelo_4tanques',Xini_1(:),Uini(:),Yini(:),IXini(:),IUini(:),IYini(:));
+[Xpo_2,Upo_2]=trim('Modelo_4tanques',Xini_2(:),Uini(:),Yini(:),IXini(:),IUini(:),IYini(:));
+[Xpo_3,Upo_3]=trim('Modelo_4tanques',Xini_3(:),Uini(:),Yini(:),IXini(:),IUini(:),IYini(:));
+[Xpo_4,Upo_4]=trim('Modelo_4tanques',Xini_4(:),Uini(:),Yini(:),IXini(:),IUini(:),IYini(:));
+
+
+%__________________________
+%% MODELOS LINEALIZADOS
+%__________________________
+% Linealizacion del punto PIDs
+[matA,matB,matC,matD]=linmod('Modelo_4tanques',Xpo,Upo);
+Pss=ss(matA,matB,matC,matD);
+Pzpk=zpk(Pss);
+% Planta qa => h1
+P1a=Pzpk(1,1);
+P1a.DisplayFormat='time constant';
+% Planta qb => h1
+P1b=Pzpk(1,2);
+P1b.DisplayFormat='time constant';
+% Planta qa => h2
+P2a=Pzpk(2,1);
+P2a.DisplayFormat='time constant';
+% Planta qb => h2
+P2b=Pzpk(2,2);
+P2b.DisplayFormat='time constant';
+%Display de la matriz Planta y de la matriz RGA
+disp('Funciones de transferencia de la planta:')
+Planta=[P1a P1b ; P2a P2b]
+RGA=dcgain(Planta).*(dcgain(inv(Planta)))'
+%Conversión a tf para integridad del GUI
+P2a = tf(P2a);
+P1b = tf(P1b);
+
+%Linealización de los puntos de los predictivos
+%Previo: definiciones para MPC designer
+TimeUnit='seconds';
+InputName={'qa','qb'};
+InputUnit={'m3/h','m3/h'};
+OutputName={'h1','h2','h3','h4'};
+OutputUnit={'m','m','m','m'};
+StateName={'h1','h2','h3','h4'};
+%%%%%%%%%%%%%%%%%%%%
+%Linealización Pto 1: h1 alta, h2 baja
+[matA,matB,matC,matD]=linmod('Modelo_4tanques',Xpo_1,Upo_1);
+Pss_1=ss(matA,matB,matC,matD);
+Ptf_1=tf(Pss_1);
+Pssd=c2d(Pss_1,ts);
+matAd_1=Pssd.a;
+matBd_1=Pssd.b;
+matCd=Pssd.c;
+matCd_1=matCd(1:2,:);
+matDd=Pssd.d;
+matDd_1=matDd(1:2,:);
+% Entradas y salidas
+P_1_mpc=ss(Pss_1.a,Pss_1.b,eye(4),zeros(4,2),'TimeUnit',TimeUnit);
+P_1_mpc.InputName = InputName;
+P_1_mpc.StateName = StateName;
+P_1_mpc.OutputName = OutputName;
+P_1_mpc.InputGroup.MV = 1:2;
+P_1_mpc.InputGroup.UD = [];
+P_1_mpc.OutputGroup.MO = 1:4;
+P_1_mpc.OutputGroup.UO = [];
+
+%%%%%%%%%%%%%%%%%%%%
+%Linealización Pto 2: h1 alta, h2 alta
+[matA,matB,matC,matD]=linmod('Modelo_4tanques',Xpo_2,Upo_2);
+Pss_2=ss(matA,matB,matC,matD);
+Ptf_2=tf(Pss_2);
+Pssd=c2d(Pss_2,ts);
+matAd_2=Pssd.a;
+matBd_2=Pssd.b;
+matCd=Pssd.c;
+matCd_2=matCd(1:2,:);
+matDd=Pssd.d;
+matDd_2=matDd(1:2,:);
+% Entradas y salidas
+P_2_mpc=ss(Pss_2.a,Pss_2.b,eye(4),zeros(4,2),'TimeUnit',TimeUnit);
+P_2_mpc.InputName = InputName;
+P_2_mpc.StateName = StateName;
+P_2_mpc.OutputName = OutputName;
+P_2_mpc.InputGroup.MV = 1:2;
+P_2_mpc.InputGroup.UD = [];
+P_2_mpc.OutputGroup.MO = 1:4;
+P_2_mpc.OutputGroup.UO = [];
+
+%%%%%%%%%%%%%%%%%%%%
+%Linealización Pto 3: h1 baja, h2 alta
+[matA,matB,matC,matD]=linmod('Modelo_4tanques',Xpo_3,Upo_3);
+Pss_3=ss(matA,matB,matC,matD);
+Ptf_3=tf(Pss_3);
+Pssd=c2d(Pss_3,ts);
+matAd_3=Pssd.a;
+matBd_3=Pssd.b;
+matCd=Pssd.c;
+matCd_3=matCd(1:2,:);
+matDd=Pssd.d;
+matDd_3=matDd(1:2,:);
+% Entradas y salidas
+P_3_mpc=ss(Pss_3.a,Pss_3.b,eye(4),zeros(4,2),'TimeUnit',TimeUnit);
+P_3_mpc.InputName = InputName;
+P_3_mpc.StateName = StateName;
+P_3_mpc.OutputName = OutputName;
+P_3_mpc.InputGroup.MV = 1:2;
+P_3_mpc.InputGroup.UD = [];
+P_3_mpc.OutputGroup.MO = 1:4;
+P_3_mpc.OutputGroup.UO = [];
+
+%%%%%%%%%%%%%%%%%%%%
+%Linealización Pto 3: h1 baja, h2 baja
+[matA,matB,matC,matD]=linmod('Modelo_4tanques',Xpo_4,Upo_4);
+Pss_4=ss(matA,matB,matC,matD);
+Ptf_4=tf(Pss_4);
+Pssd=c2d(Pss_4,ts);
+matAd_4=Pssd.a;
+matBd_4=Pssd.b;
+matCd=Pssd.c;
+matCd_4=matCd(1:2,:);
+matDd=Pssd.d;
+matDd_4=matDd(1:2,:);
+% Entradas y salidas
+P_4_mpc=ss(Pss_4.a,Pss_4.b,eye(4),zeros(4,2),'TimeUnit',TimeUnit);
+P_4_mpc.InputName = InputName;
+P_4_mpc.StateName = StateName;
+P_4_mpc.OutputName = OutputName;
+P_4_mpc.InputGroup.MV = 1:2;
+P_4_mpc.InputGroup.UD = [];
+P_4_mpc.OutputGroup.MO = 1:4;
+P_4_mpc.OutputGroup.UO = [];
+
+
+
+%__________________________________
+%% CONTROL PID DESCENTRALIZADO
+%__________________________________
+% Control PID qb -> h1 (PID accion diferencial al error)
+K_h1=0.5;
+Ti_h1=inf;
+Td_h1=0;
+N_h1=1;
+b_h1=1;
+% Control PID qa -> h2 (PID accion diferencial al error)
+K_h2=0.5;
+Ti_h2=inf;
+Td_h2=0;
+N_h2=1;
+b_h2=1;
+
+%______________________________________________________
+%% CONTROL PID CON DESACOPLO POR PREALIMENTACION
+%______________________________________________________
+%Previo a la definición de los parámetros del controlador: Diseño del
+%desacoplo (matriz de transferencia y red de desacoplo)
+disp('CONTROL PID CON DESACOPLO POR PREALIMENTACION')
+% Ceros de transmision de la planta
+ceros=tzero(Planta);
+% Se determinan los ceros de transmision positivos
+auxTanques=(ceros>=0);
+ceros_pos=ceros(auxTanques);
+% DESACOPLO ESTATICO POR PREALIMENTACION
+Planta_hat=minreal(zpk(Planta/dcgain(Planta)));
+Planta_hat.DisplayFormat='time constant';
+% D0=inv(dcgain(Planta));
+% Da1=tf(D0(1,1),1);
+% Da2=tf(D0(1,2),1);
+% Db1=tf(D0(1,2),1);
+% Db2=tf(D0(2,2),1);
+% DESACOPLO DINAMICO POR PREALIMENTACION
+% Funcion de transferencia con los ceros positivos
+if isempty(ceros_pos)
+    Pzp=1;
+else
+    Pzp=zpk(ceros_pos,[],1);
+    Pzp=Pzp/dcgain(Pzp);
+    Pzp.DisplayFormat='time constant';
+end
+[num1a,den1a]=tfdata(P1a,'v');
+[num1b,den1b]=tfdata(P1b,'v');
+[num2a,den2a]=tfdata(P2a,'v');
+[num2b,den2b]=tfdata(P2b,'v');
+aux11=minreal(tf(P1a+P1b));
+aux22=minreal(tf(P2a+P2b));
+matM11=minreal(tf(1,aux11.den{1})*Pzp);
+matM22=minreal(tf(1,aux22.den{1})*Pzp);
+matM=zpk([matM11/dcgain(matM11) 0 ; 0 matM22/dcgain(matM22)]);
+matN=zpk([minreal(P1a/matM(1,1)) minreal(P1b/matM(1,1)) ; ...
+    minreal(P2a/matM(2,2)) minreal(P2b/matM(2,2))]);
+matM.DisplayFormat='time constant';
+matN.DisplayFormat='time constant';
+matNinv=minreal(inv(matN));
+%Display de la matriz del sistema desacoplado
+disp('Planta desacoplada:')
+matM
+matM = tf(matM);
+% Discretizacion de la red de desacoplo
+disp('Red de desacoplo:')
+% matNinv
+matNinvd=c2d(matNinv,ts);
+Da1=tf(matNinvd(1,1));
+Da2=tf(matNinvd(1,2));
+Db1=tf(matNinvd(2,1));
+Db2=tf(matNinvd(2,2));
+
+%%%%%%%%%%%%%%%%%%%%%%
+% CONTROLES DESACOPLADOS
+% Control PID u1 -> h1 (PID accion diferencial a la salida)
+K_h1_des=0.5;
+Ti_h1_des=inf;
+Td_h1_des=0;
+N_h1_des=1;
+b_h1_des=1;
+% Control PID u2 -> h2 (PID accion diferencial  a la salida)
+K_h2_des=0.5;
+Ti_h2_des=inf;
+Td_h2_des=0;
+N_h2_des=1;
+b_h2_des=1;
+
+%________________________________________________
+%% CONTROL PREDICTIVO Y PREDICTIVO ADAPTATIVO
+%________________________________________________
+
+%CARGAR EL/LOS .mat EN LOS QUE SE HAYAN EXPORTADO LOS CONTROLADORES
+%PREDICTIVOS DISEÑADOS CON mpctool. El nombre del objeto de tipo
+%'controlador predictivo' que aparezca en el workspace tras la carga del
+%.mat tiene que coincidir con el nombre incluido en el bloque de control
+%predictivo del modelo de Simulink.
+
+load MPC_4TANQUES_CONTROL
+load MPC_4TANQUES_CONTROL_1_1
+load MPC_4TANQUES_CONTROL_1_2
+load MPC_4TANQUES_CONTROL_1_3
+load MPC_4TANQUES_CONTROL_1_4
+
+
+
+%_______________
+%% SIMULACION
+%_______________
+
+% Tiempo de llenado inicial
+t_ini = 3000;
+T=tEsc;
+% Secuencia de cambios en referencia
+t_ref=[0 t_ini-ts t_ini  t_ini+tEsc-ts t_ini+tEsc t_ini+tEsc*2-ts t_ini+tEsc*2 t_ini+tEsc*3-ts t_ini+tEsc*3 t_ini+tEsc*4];
+% Tiempo final de simulacion
+t_fin=t_ini+tEsc*4-ts;
+% Referencias
+h1_ref=[Xpo_4(1) Xpo_4(1) Xpo_1(1) Xpo_1(1) Xpo_2(1) Xpo_2(1) Xpo_3(1) Xpo_3(1) Xpo_4(1) Xpo_4(1)];
+h2_ref=[Xpo_4(2) Xpo_4(2) Xpo_1(2) Xpo_1(2) Xpo_2(2) Xpo_2(2) Xpo_3(2) Xpo_3(2) Xpo_4(2) Xpo_4(2)];
+% load categoria1
+Tsim = t_fin+ts;
+Tini = t_ini;
+% Simulacion
+sim('Control_4tanques_SIM_Simplificado')
+
+%______________________________
+%% REPRESENTACION GRAFICA
+%______________________________
+tamTitulos = 21;
+tamEtiqu = 16;
+tamEjes = 12;
+ctrlEjes = 1;
+maxNiveles = Hmax;
+minNiveles = Hmin;
+limSupH = max(maxNiveles);
+limInfH = min(minNiveles);
+
+%Figura variables controladas / mandos
+figure('units','normalized','outerposition',[0 0 1 1])
+subplot(221)
+plot(H1(:,1),H1(:,[2:1+visualizar 6]),'LineWidth',2)
+grid
+ylabel('Salida h1 (m) y referencia (m)','fontsize',tamEtiqu,'fontweight','b')
+xlim([0 Tsim])
+xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+legend(listaLeyendas{1:visualizar},listaLeyendas{5},'Location','best');
+set(gca,'fontsize',tamEjes,'fontweight','b')
+xlim([t_ini-500 H1(end,1)])
+ejes(ctrlEjes)=gca;
+ctrlEjes = ctrlEjes + 1;
+
+subplot(222)
+plot(H2(:,1),H2(:,[2:1+visualizar 6]),'LineWidth',2)
+grid
+ylabel('Salida h2 (m) y referencia (m)','fontsize',tamEtiqu,'fontweight','b')
+xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+xlim([0 Tsim])
+legend(listaLeyendas{1:visualizar},listaLeyendas{5},'Location','best');
+set(gca,'fontsize',tamEjes,'fontweight','b')
+ejes(ctrlEjes)=gca;
+ctrlEjes = ctrlEjes + 1;
+
+subplot(223)
+plot(Qa(:,1),Qa(:,2:1+visualizar),'LineWidth',2)
+grid
+ylabel('mando qa (m3/h)','fontsize',tamEtiqu,'fontweight','b')
+xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+xlim([0 Tsim])
+legend(listaLeyendas{1:visualizar},'Location','best');
+set(gca,'fontsize',tamEjes,'fontweight','b')
+ejes(ctrlEjes)=gca;
+ctrlEjes = ctrlEjes + 1;
+
+subplot(224)
+plot(Qb(:,1),Qb(:,2:1+visualizar),'LineWidth',2)
+grid
+ylabel('mando qb (m3/h)','fontsize',tamEtiqu,'fontweight','b')
+xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+xlim([0 Tsim])
+legend(listaLeyendas{1:visualizar},'Location','best');
+set(gca,'fontsize',tamEjes,'fontweight','b')
+ejes(ctrlEjes)=gca;
+ctrlEjes = ctrlEjes + 1;
+
+if tipo_ensayo>0
+    %Figura con todos los niveles y referencias
+    figure('units','normalized','outerposition',[0 0 1 1])
+    subplot(411)
+    plot(H1(:,1),H1(:,[2:1+visualizar 6]),'LineWidth',2)
+    hold on
+    plot([H1(1,1) H1(end,1)],[1 1]*maxNiveles(1),'r--','LineWidth',1)
+    plot([H1(1,1) H1(end,1)],[1 1]*minNiveles(1),'r--','LineWidth',1)
+    grid
+    ylabel('h1 (m)','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    axis([0 Tsim 0 1.5])
+    legend(listaLeyendas{1:visualizar},listaLeyendas{5},'Restricciones','Location','best');
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    title('Evolución de los niveles en los tanques','fontsize',tamTitulos,'fontweight','b')
+    xlim([t_ini-500 H1(end,1)])
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    subplot(412)
+    plot(H2(:,1),H2(:,[2:1+visualizar 6]),'LineWidth',2)
+    hold on
+    plot([H1(1,1) H1(end,1)],[1 1]*maxNiveles(2),'r--','LineWidth',1)
+    plot([H1(1,1) H1(end,1)],[1 1]*minNiveles(2),'r--','LineWidth',1)
+    grid
+    ylabel('h2 (m)','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    axis([0 Tsim 0 1.5])
+    legend(listaLeyendas{1:visualizar},listaLeyendas{5},'Restricciones','Location','best');
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    subplot(413)
+    plot(H3(:,1),H3(:,2:1+visualizar),'LineWidth',2)
+    hold on
+    plot([H1(1,1) H1(end,1)],[1 1]*maxNiveles(3),'r--','LineWidth',1)
+    plot([H1(1,1) H1(end,1)],[1 1]*minNiveles(3),'r--','LineWidth',1)
+    grid
+    ylabel('h3 (m)','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    axis([0 Tsim 0 1.5])
+    legend(listaLeyendas{1:visualizar},'Restricciones','Location','best');
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    subplot(414)
+    plot(H4(:,1),H4(:,2:1+visualizar),'LineWidth',2)
+    hold on
+    plot([H1(1,1) H1(end,1)],[1 1]*maxNiveles(4),'r--','LineWidth',1)
+    plot([H1(1,1) H1(end,1)],[1 1]*minNiveles(4),'r--','LineWidth',1)
+    grid
+    ylabel('h4 (m)','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    axis([0 Tsim 0 1.5])
+    legend(listaLeyendas{1:visualizar},'Restricciones','Location','best');
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    % Figura índices de desempeño
+    figure('units','normalized','outerposition',[0 0 1 1])
+    subplot(211)
+    plot(J(:,1),J(:,2:1+visualizar),'LineWidth',2)
+    grid
+    ylabel('J','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    xlim([0 Tsim])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    legend(listaLeyendas{1:visualizar},'Location','best');
+    title('Evolución del índice de desempeño','fontsize',tamTitulos,'fontweight','b')
+    xlim([t_ini-500 H1(end,1)])
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    subplot(212)
+    plot(ID(:,1),ID(:,2:1+visualizar),'LineWidth',2)
+    grid
+    ylabel('ID','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    xlim([0 Tsim])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    legend(listaLeyendas{1:visualizar},'Location','best');
+    title(['Indice de desempeño del concurso: ',num2str(round(ID(end,1+visualizar)))],'fontsize',tamTitulos,'fontweight','b');
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    
+    if visualizar == 1
+        JDesglosadas = JDesglosadas_1;
+        JINT = JINT1;
+    elseif visualizar == 2
+        JDesglosadas = JDesglosadas_2;
+        JINT = JINT2;
+    elseif visualizar == 3
+        JDesglosadas = JDesglosadas_3;
+        JINT = JINT3;
+    elseif visualizar == 4
+        JDesglosadas = JDesglosadas_4;
+        JINT = JINT4;
+    end
+    
+    
+    %Figura costes del predictivo desglosados
+    figure('units','normalized','outerposition',[0 0 1 1])
+    plot(JDesglosadas(:,1),JDesglosadas(:,2:4),'LineWidth',2)
+    grid
+    ylabel('Js concurso CEA','fontsize',tamEtiqu,'fontweight','b')
+    xlabel('Tiempo (s)','fontsize',tamEtiqu,'fontweight','b')
+    xlim([0 Tsim])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    legend('Coste caudales (Jq)','Coste volúmenes (Jv)','Coste restricciones (Jr)','Location','best');
+    xlim([t_ini-500 H1(end,1)])
+    ejes(ctrlEjes)=gca;
+    ctrlEjes = ctrlEjes + 1;
+    linkaxes(ejes,'x')
+    
+    %Figuras con desglose de ID por tramos
+    %parche para análisis tramo a tramo
+    tramoATramo_Q = zeros(1,4);
+    tramoATramo_Seg = zeros(1,4);
+    tramoATramo_Restr = zeros(1,4);
+    marcasT = t_ref([5 7 9 10]);
+    indTr = NaN(4,2);
+    
+    indAnt = find(JDesglosadas(:,1)<marcasT(1)); indTr(1,:) = [1 indAnt(end)];
+    for ctrlTramo = 2:4
+        auxiliar = find(JDesglosadas(:,1)<marcasT(ctrlTramo));
+        indTr(ctrlTramo,:) = [indAnt(end) auxiliar(end)];
+        indAnt = auxiliar;
+    end
+    indTr(end) = indTr(end) + 1;
+    for ctrlTramo = 1:4
+        tramoATramo_Q(ctrlTramo) = diff(JINT(indTr(ctrlTramo,:),2));
+        tramoATramo_Seg(ctrlTramo) = diff(JINT(indTr(ctrlTramo,:),3));
+        tramoATramo_Restr(ctrlTramo) = diff(JINT(indTr(ctrlTramo,:),4));
+    end
+    
+    figure('units','normalized','outerposition',[0 0 1 1])
+    bar(tramoATramo_Q)
+    grid
+    title('ID tramo a tramo. Caudales','fontsize',tamTitulos,'fontweight','b')
+    ylabel('ID parcial','fontsize',tamEtiqu,'fontweight','b')
+    set(gca,'xtick',1:4,'xticklabel',{'Tr 1','Tr 2','Tr 3','Tr 4'})
+    xlim([0.5 4.5])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    for ctrlTramo = 1:4
+        text(ctrlTramo,tramoATramo_Q(ctrlTramo),num2str(tramoATramo_Q(ctrlTramo),5),'fontsize',tamEtiqu,'fontweight','b',...
+            'verticalalignment','bottom','horizontalalignment','center')
+    end
+    
+    figure('units','normalized','outerposition',[0 0 1 1])
+    bar(tramoATramo_Seg)
+    grid
+    title('ID tramo a tramo. Seguimiento','fontsize',tamTitulos,'fontweight','b')
+    ylabel('ID parcial','fontsize',tamEtiqu,'fontweight','b')
+    set(gca,'xtick',1:4,'xticklabel',{'Tr 1','Tr 2','Tr 3','Tr 4'})
+    xlim([0.5 4.5])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    for ctrlTramo = 1:4
+        text(ctrlTramo,tramoATramo_Seg(ctrlTramo),num2str(tramoATramo_Seg(ctrlTramo),4),'fontsize',tamEtiqu,'fontweight','b',...
+            'verticalalignment','bottom','horizontalalignment','center')
+    end
+    
+    
+    figure('units','normalized','outerposition',[0 0 1 1])
+    bar(tramoATramo_Restr)
+    grid
+    title('ID tramo a tramo. Restricciones','fontsize',tamTitulos,'fontweight','b')
+    ylabel('ID parcial','fontsize',tamEtiqu,'fontweight','b')
+    set(gca,'xtick',1:4,'xticklabel',{'Tr 1','Tr 2','Tr 3','Tr 4'})
+    xlim([0.5 4.5])
+    set(gca,'fontsize',tamEjes,'fontweight','b')
+    for ctrlTramo = 1:4
+        text(ctrlTramo,tramoATramo_Restr(ctrlTramo),num2str(tramoATramo_Restr(ctrlTramo),4),'fontsize',tamEtiqu,'fontweight','b',...
+            'verticalalignment','bottom','horizontalalignment','center')
+    end
+else
+    linkaxes(ejes,'x')
+end
+
+
+%____________________________
+%% INDICES DE DESEMPEÑO
+%____________________________
+disp('INDICES DE DESEMPEÑO:')
+for nn=1:visualizar
+    fprintf('%s: %d\n',listaLeyendas{nn},round(ID(end,nn+1)))
+end
+
+
+\end{sourcecode}
+		
+
+\end{anexo}

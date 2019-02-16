@@ -1,0 +1,7 @@
+Sólo hay que modificar el archivo contenido.tex. Si queréis comprobar los cambios, hay compilar el archivo informe.tex, eso es todo.
+
+A veces no se muestra el contenido del índice. Lo que tenéis que hacer es volver a compilar y esperar que esta vez si que se muestre.
+
+Las imágenes metedlas en la carpeta de img/imagenes/, y luego referenciarlas en el documento como imagenes/nombre_imagen.png 
+
+Sólo está hecho hasta OBJETIVOS DE CONTROL, a partir de ahí todo el texto que hay es de la plantilla (que nos sirve para enterarnos como meter tablas, imágenes, etc.). Lo único ya hecho a partir de esto son las referencias y el anexo.

@@ -1,0 +1,17 @@
+\babel@toc {spanish}{}
+\contentsline {section}{\numberline {1}Descripci\IeC {\'o}n de la planta}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Especificaciones}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Modelo no-lineal y puntos de operaci\IeC {\'o}n}{2}{subsection.1.2}
+\contentsline {section}{\numberline {2}Objetivos del control}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}Calidad de respuesta}{3}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Minimizar funci\IeC {\'o}n de coste}{4}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Robustez}{5}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}---- NO PARA EL INFORME -- Como meter im\IeC {\'a}genes}{6}{subsection.2.4}
+\contentsline {section}{\numberline {3}Control PID Cl\IeC {\'a}sico}{7}{section.3}
+\contentsline {subsection}{Listas y Enumeraciones}{7}{section.3}
+\contentsline {subsection}{\numberline {3.1}Otros}{7}{subsection.3.1}
+\contentsline {section}{\numberline {4}Control PID desacoplado}{8}{section.4}
+\contentsline {section}{\numberline {5}Control predictivo}{9}{section.5}
+\contentsline {section}{\numberline {6}Control predictivo adaptativo (gain scheduling)}{10}{section.6}
+\contentsline {section}{Referencias}{11}{section*.6}
+\contentsline {section}{Anexo \numberline {A}C\IeC {\'o}digo fuente}{12}{Anexo.1.Alph1}
