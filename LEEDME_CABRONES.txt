@@ -5,3 +5,5 @@ A veces no se muestra el contenido del índice. Lo que tenéis que hacer es volv
 Las imágenes metedlas en la carpeta de img/imagenes/, y luego referenciarlas en el documento como imagenes/nombre_imagen.png 
 
 Sólo está hecho hasta OBJETIVOS DE CONTROL, a partir de ahí todo el texto que hay es de la plantilla (que nos sirve para enterarnos como meter tablas, imágenes, etc.). Lo único ya hecho a partir de esto son las referencias y el anexo.
+
+El índice de contenido está hecho ya, solo hay cambiar el contenido que hay dentro de cada título.
